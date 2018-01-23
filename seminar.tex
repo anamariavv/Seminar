@@ -3,6 +3,11 @@
 \usepackage[croatian]{babel}
 \usepackage{graphicx}
 \usepackage{graphicx}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{bookmark}
+\usepackage{pgfplots}
+
 \graphicspath{ {figures/} }
 \usepackage{array}
 \usetheme{Warsaw}
@@ -10,6 +15,19 @@
 \setbeamercolor*{palette primary}{use=structure,fg=black,bg=mygreen}
 \definecolor{mygreen1}{rgb}{0.0, 0.5, 0.0}
 \setbeamercolor*{palette quaternary}{fg=black,bg=mygreen1}
+\newcommand\Fontvi{\fontsize{6,5}{7.5}\selectfont}
+\newcommand\Fon{\fontsize{8}{7.5}\selectfont}
+
+\pgfplotsset{width=10cm,height=8cm}
+
+
+\pgfplotsset{every axis/.append style={
+                    axis x line=middle,    
+                    axis y line=middle,    
+                    axis line style={<->,color=blue}, 
+                    xlabel={$x$},          
+                    ylabel={$y$},          
+            }}
 
 \title[IZRADA TABLICA I GRAFIKONA\hspace{20mm} \insertframenumber/\inserttotalframenumber]{IZRADA TABLICA I GRAFIKONA}
 \author{Anamaria Vargić \  Jelena Stojković  \  Valentina Ecimović}
@@ -17,32 +35,581 @@
 \date{2018}
  
 \begin{document}
-\logo{\includegraphics[height=2.5cm]{lap.jpg}[hb]}
+
 
 \frame{\titlepage}
-%slajd sa sadrzajem
+
+
+\begin{frame}
+\frametitle{Izdrada tablica iz .csv datoteka} 
+    \begin{itemize}     
+        \item .csv (comma separated value) datoteke možemo proizvesti u programima kao što su Microsoft Excel i Google spreadsheet
+        \item stvaranje tablica iz .csv datoteka nam omogućava \textbf{pgfplotstable} paket
+        \item potrebno je učitati paket u preambulu dokumenta 
+        \item ovu metodu generiranja tablica koristimo kada radimo s velikim količinama podataka    
+    \end{itemize}   
+\end{frame}
+
+\begin{frame}
+\frametitle{primjer tablice}
+    \begin{figure}
+        \includegraphics[width=0.8\linewidth]{tablica.png}
+        \caption{Tablica 1}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{primjer tablice}
+\begin{verbatim}
+\begin{document}
+\pgfplotstabletypeset[
+col sep = comma,
+string replace*={_}{\textsubscript},
+every head row/.style={before row=\toprule,after row=\midrule},
+every last row/.style={after row=\bottomrule},
+display columns/0/.style={string type,column name={}}
+]
+{avg_value.csv} %ovdje ide naziv vase .csv datoteke
+
+\end{document}
+\end{verbatim}
+\end{frame}
+
+%valentina
 \begin{frame}
 
-\frametitle{Sadržaj}
+\frametitle{Izrada grafikona}
 
-\tableofcontents
+\begin{itemize}
+\setlength\itemsep{1em}
+
+\item za vizualiziranje podataka koristimo \textbf{pgfplots} package s kojime dobijemo autogenerirane grafikone
+
+\item \textbf{pgfplots} package iz tikz/pgf omogućuje nam izradu grafikona iz podataka direktno iz .csv datoteka 
+\item buduci da je \textbf{pgfplots} baziran na \textbf{tikz}-u grafikon se mora nalaziti unutar \textit{tikzpicture} okružja
+
+
+\end{itemize}
 
 \end{frame}
+
+
+
+\begin{frame}[fragile]
+\frametitle{Izrada grafikona}
+
+\begin{itemize}
+\setlength\itemsep{1em}
+
+\item kako bi uključili \textbf{pgfplots} u dokument u preamblu moramo upisati:
+    \begin{verbatim}
+        \usepackage{pgfplots}
+    \end{verbatim}
+\item dodatne postavke za taj paket se mogu upisati u preamblu kao npr:
+    \begin{verbatim}
+        \pgfplotsset{width=2cm,compat=2.0}
+    \end{verbatim}
+    width mijenja veličinu svake pgfplot figure na 2 cm,compat određuje koju verziju paketa ćemo koristiti
+        
+    
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}
-\frametitle{Lista tabela i slika}
+
+\frametitle{Izrada grafikona}
+
+\begin{itemize}
+\item korisnik mora unjeti samo podatke kao npr.
+\begin{itemize}
+\item oznake za osi koordinatnog sustava
+\item unose za legende 
+\item koordinate točaka
+\end{itemize}
+
+i \textbf{pgfplots} će na temelju tih podataka izraditi grafikon
+
+\item izrađuje normalne, logaritamske i polulogaritamske grafikone u 2 ili 3 dimenzije 
 
 
-\listoffigures
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Primjer jednostavnog grafikona}
+\Fon
+\begin{verbatim}
+
+\documentclass{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage[utf8]{inputenc}
+
+\usepackage{pgfplots}
+\pgfplotsset{width=10cm,compat=1.9}
+
+\begin{document}
+
+
+
+\begin{tikzpicture}
+\begin{axis}
+\addplot[color=red]{exp(x)};
+\end{axis}
+\end{tikzpicture}
+
+
+
+\end{document}
+
+\end{verbatim}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Primjer jednostavnog grafikona}
+    \begin{tikzpicture}
+        \begin{axis}
+            \addplot[color=red]{exp(x)};
+        \end{axis}
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+
+\frametitle{Parametarski grafikon - primjer}
+\Fontvi
+
+\begin{verbatim}
+\documentclass{article}
+\usepackage{pgfplots}
+\pgfplotsset{width=15cm,height=15cm} %dimenzije grafa
+
+\pgfplotsset{every axis/.append style={
+                    axis x line=middle,    % pozicionira x os u sredinu
+                    axis y line=middle,    % pozicionira y os u sredinu
+                    axis line style={<->,color=blue}, % stavlja strelice na osi
+                    xlabel={$x$},          % označava x-os sa oznakom x
+                    ylabel={$y$},          % označava y-os sa oznakom y
+            }}
+
+\begin{document}
+
+\begin{tikzpicture}  % tikzpicture okružje
+    \begin{axis}[
+            xmin=-10,xmax=10, % određuje granice x-osi
+            ymin=-10,ymax=10, % određuje granice y-osi
+            grid=both,
+            ]
+            \addplot [domain=-3:3,samples=50]({x^3-3*x},{3*x^2-9}); 
+    \end{axis}
+\end{tikzpicture}
+\end{document}
+\end{verbatim}
+
+
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Parametarski grafikon - primjer}
+
+\begin{tikzpicture}
+    \begin{axis}[
+            xmin=-10,xmax=10,
+            ymin=-10,ymax=10,
+            grid=both,
+            ]
+            \addplot [domain=-3:3,samples=50]({x^3-3*x},{3*x^2-9}); 
+    \end{axis}
+\end{tikzpicture}
+\end{frame}
+%jelena
+\begin{frame}[fragile]
+\frametitle{2D grafikoni}
+
+\textbf{2D} grafikone možete persionalizirati tj. prilagoditi ih svojim potrebama.
+Oni mogu predstavljati npr: 
+\begin{itemize}
+    \item matematički dijagram 
+
+    \item temperaturni dijagram 
+
+    \item podatkovani dijagram itd. 
+
+\end{itemize}
+
+
+\end{frame}
+%kod matematicki
+\begin{frame}[fragile]
+\frametitle{Primjer matematičkog grafikona}
+\Fontvi
+    \begin{verbatim}
+\documentclass[10pt]{article}
+\usepackage{pgfplots}
+\pgfplotsset{width=10cm,height=10cm} %dimenzije grafa
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+    axis lines = left,
+    xlabel = $x$,
+    ylabel = {$f(x)$},
+]
+
+\addplot [
+    domain=-10:10, 
+    samples=100, 
+    color=red,
+]
+{x^2 - 2*x - 1};
+\addlegendentry{$x^2 - 2x - 1$}
+
+\addplot [
+    domain=-10:10, 
+    samples=100, 
+    color=blue,
+    ]
+    {x^2 + 2*x + 1};
+\addlegendentry{$x^2 + 2x + 1$}
  
-\listoftables
+\end{axis}
+\end{tikzpicture}
+\end{document}
+    \end{verbatim}
+\end{frame}
+%matematicki
+\begin{frame}
+\frametitle{Primjer matematičkog grafikona}
+
+
+\begin{tikzpicture}
+\begin{axis}[
+    axis lines = left,
+    xlabel = $x$,
+    ylabel = {$f(x)$},
+]
+
+\addplot [
+    domain=-10:10, 
+    samples=100, 
+    color=red,
+]
+{x^2 - 2*x - 1};
+\addlegendentry{$x^2 - 2x - 1$}
+
+\addplot [
+    domain=-10:10, 
+    samples=100, 
+    color=blue,
+    ]
+    {x^2 + 2*x + 1};
+\addlegendentry{$x^2 + 2x + 1$}
  
-\newpage
+\end{axis}
+\end{tikzpicture}
+
+
+\end{frame}
+%temperatura
+
+\begin{frame}[fragile]
+\frametitle{Primjer 2D grafikona}
+\Fontvi
+
+\begin{verbatim}
+\documentclass[10pt]{article}
+\usepackage{pgfplots}
+\pgfplotsset{width=10cm,height=10cm} %dimenzije grafa
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
+    xlabel={Temperature},
+    ylabel={Solubility},
+    xmin=0, xmax=100,
+    ymin=0, ymax=120,
+    xtick={0,20,40,60,80,100},
+    ytick={0,20,40,60,80,100,120},
+    legend pos=north east,
+    ymajorgrids=true,
+    grid style=dashed,
+]
+ \addplot[
+    color=blue,
+    mark=square,
+    ]
+    coordinates {
+    (0,23.1)(10,27.5)(20,32)(30,37.8)(40,44.6)(60,61.8)(80,83.8)(100,114)
+    };
+    \legend{CuSO$_4\cdot$5H$_2$O}
  
-\pagenumbering{arabic}
-\end{frame} 
+\end{axis}
+\end{tikzpicture}
+\end{document}
+\end{verbatim}
+
+\end{frame}
+%temperatura
+\begin{frame}
+\frametitle{Primjer 2D grafikona}
+
+
+\begin{tikzpicture}
+\begin{axis}[
+    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
+    xlabel={Temperature},
+    ylabel={Solubility},
+    xmin=0, xmax=100,
+    ymin=0, ymax=120,
+    xtick={0,20,40,60,80,100},
+    ytick={0,20,40,60,80,100,120},
+    legend pos=north east,
+    ymajorgrids=true,
+    grid style=dashed,
+]
+ 
+\addplot[
+    color=blue,
+    mark=square,
+    ]
+    coordinates {
+    (0,23.1)(10,27.5)(20,32)(30,37.8)(40,44.6)(60,61.8)(80,83.8)(100,114)
+    };
+    \legend{CuSO$_4\cdot$5H$_2$O}
+ 
+\end{axis}
+\end{tikzpicture}
+
+
+\end{frame}
+%scatter grafikoni
+\begin{frame}[fragile]
+\frametitle{``Scatter'' grafikoni}
+\textbf{Scatter} grafikoni se koriste za prikazivanje nekih informacija kao neku vrstu oznake.
+Npr. prilikom računanja statističke regresije.
+
+
+\end{frame}
+%grafion sa stupcima
+\begin{frame}
+\frametitle{Grafikoni sa stupcima}
+
+\textbf{Grafikoni sa stupcima} koriste se za prikaz prikupljenih podataka i to uglavnom statističkih podataka o nečemu.
+\end{frame}
+%kod grafikon sa stupcima
+\begin{frame}[fragile]
+\frametitle{Primjer grifikona sa stupcima}
+\Fontvi
+
+\begin{verbatim}
+\documentclass[10pt]{article}
+\usepackage{pgfplots}
+\pgfplotsset{width=10cm,height=10cm} %dimenzije grafa
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+    x tick label style={
+        /pgf/number format/1000 sep=},
+    ylabel=Year,
+    enlargelimits=0.05,
+    legend style={at={(0.5,-0.1)},
+    anchor=north,legend columns=-1},
+    ybar interval=0.7,
+]
+\addplot 
+    coordinates {(2012,408184) (2011,408348)
+         (2010,414870) (2009,412156)};
+\addplot 
+    coordinates {(2012,388950) (2011,393007) 
+        (2010,398449) (2009,395972)};
+\legend{Men,Women}
+\end{axis}
+\end{tikzpicture}
+
+
+\end{document}
+\end{verbatim}
+\end{frame}
+%grafikon sa stupcima 
+\begin{frame}
+\frametitle{Primjer grafikona sa stupcima}
+\begin{tikzpicture}
+\begin{axis}[
+    x tick label style={
+        /pgf/number format/1000 sep=},
+    ylabel=Year,
+    enlargelimits=0.05,
+    legend style={at={(0.5,-0.1)},
+    anchor=north,legend columns=-1},
+    ybar interval=0.7,
+]
+\addplot 
+    coordinates {(2012,408184) (2011,408348)
+         (2010,414870) (2009,412156)};
+\addplot 
+    coordinates {(2012,388950) (2011,393007) 
+        (2010,398449) (2009,395972)};
+\legend{Men,Women}
+\end{axis}
+\end{tikzpicture}
+\end{frame}
+%3d matematicki
+\begin{frame}[fragile]
+\frametitle{3D grafikon}
+\Fontvi
+
+\begin{verbatim}
+\documentclass[10pt]{article}
+\usepackage{pgfplots}
+\pgfplotsset{width=10cm,height=10cm} %dimenzije grafa
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+    title=Primjer korištenja mrežnog parametra,
+    hide axis, %osa se neće prikazati
+    colormap/cool,
+]
+\addplot3[
+    mesh,
+    samples=50,
+    domain=-8:8,
+]
+{sin(deg(sqrt(x^2+y^2)))/sqrt(x^2+y^2)};
+\addlegendentry{$\frac{sin(r)}{r}$}
+\end{axis}
+\end{tikzpicture
+\end{tikzpicture}
+\end{tikzpicture}
+\end{verbatim}
+\end{frame}
+\begin{frame}
+\frametitle{3D grafikon}
+
+
+\begin{tikzpicture}
+\begin{axis}[
+    title=Primjer korištenja mrežnog parametra,
+    hide axis,
+    colormap/cool,
+]
+\addplot3[
+    mesh,
+    samples=50,
+    domain=-8:8,
+]
+{sin(deg(sqrt(x^2+y^2)))/sqrt(x^2+y^2)};
+\addlegendentry{$\frac{sin(r)}{r}$}
+\end{axis}
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Konturni grafikoni}
+    \begin{itemize}
+        \item koristeći \textbf{pgfplots} paket možemo stvarati i konturne grafikone    
+    \end{itemize}   
+    \begin{figure}
+        \includegraphics[width=1.5\linewidth]{konturni.png}
+        \caption{Konturni graf}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Konturni grafikoni}
+    \begin{verbatim}
+\begin{document}
+
+\begin{tikzpicture}
+\begin{axis}
+[
+    title={},
+    view={0}{50}
+]
+\addplot3[
+    contour gnuplot={levels={0.9, 0.5, 0.2, -0.3}}
+]
+{sin(deg(sqrt(x^2+y^2)))/sqrt(x^2+y^2)};
+\end{axis}
+\end{tikzpicture}
+
+\end{document}
+    \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Konturni grafikoni}
+    \begin{verbatim}
+        view={0}{50}
+    \end{verbatim}
+    \begin{itemize}
+        \item mijenjanjem vrijednosti u zagradama se rotiramo oko z osi odnosno x osi
+    \end{itemize}
+    \begin{verbatim}
+         contour gnuplot={levels={0.9, 0.5, 0.2, -0.3}}
+    \end{verbatim}
+    \begin{itemize}
+        \item koristimo vanjski softver gnuplot za računanje konturnih linija
+        \item parammetar levels diktira na kojim će se vrijednostima graf izdizati tj. gdje će se pojavljivati konturne linije
+    \end{itemize}   
+\end{frame}
+
+\begin{frame}
+\frametitle{Grafikon površine}
+    \begin{figure}
+        \includegraphics[width=1.5\linewidth]{povrsina.png}
+        \caption{Grafikon površine}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Grafikon površine} 
+    
+    \begin{verbatim}        
+\begin{document}
+
+\begin{tikzpicture}
+\begin{axis}
+\addplot3[
+    surf,
+] 
+coordinates {
+(0,0,0) (0,1,0) (0,2,0)
+
+(1,0,0) (1,1,0.6) (1,2,0.7)
+
+(2,0,0) (2,1,0.7) (2,2,1.8)
+};
+\end{axis}
+\end{tikzpicture}
+\end{document}
+    \end{verbatim}
+\end{frame}
+
+\begin{frame}
+\frametitle{Grafikon površine}
+    \begin{itemize}
+        \item unošenjem koordinata točaka u obliku matrice dobit ćemo grafikon površine
+        \item naredbe za oblikovanje 3D grafikona vrijede i za oblikovanje ovog grafikona
+    \end{itemize}   
+\end{frame}
+
+\begin{frame}
+\frametitle{Literatura} 
+\bibliographystyle{IEEEtr}
+\begin{thebibliography}{9}
+\beamertemplatetextbibitems
+    \bibitem{link1} \url{https://www.latex-tutorial.com/tutorials/pgfplotstable/}
+    \bibitem{link2}  \url{https://www.latex-tutorial.com/tutorials/pgfplots/}
+    \bibitem{link3} \url{https://www.sharelatex.com/learn/Pgfplots_package}
+    \bibitem{link4} \url{http://pgfplots.sourceforge.net/pgfplotstable.pdf}
+\end{thebibliography}
+\end{frame}
 \end{document}
 
 
  
  
-
